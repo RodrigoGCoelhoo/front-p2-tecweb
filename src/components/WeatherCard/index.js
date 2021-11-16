@@ -4,10 +4,7 @@ import './style.css';
 import api from '../../services/api'
 import apiBase from '../../services/apiBase'
 
-import rain from '../../assets/rainColour.png';
-import sun from '../../assets/sunColour.png';
-import cloud from '../../assets/cloudColour.png';
-import cloudy from '../../assets/cloudyColour.png';
+import share from '../../assets/share.png';
 import trash from '../../assets/trash.png';
 import { toast } from 'react-toastify';
 
@@ -45,12 +42,20 @@ export function WeatherCard(props) {
     props.setFavsList(favsListTemp)
   }
 
+  async function openWeather() {
+    props.search(props.favData?.cidade)
+    props.setFavorited(true)
+  }
+
   return(
     <div className="weathercard-bg">
       <div className="weathercard-header">
         <h3 style={{color: 'white'}}>{props.favData?.cidade}</h3>
         <button className='trash-btn' onClick={deleteWeather}>
           <img src={trash} style={{width: "18px"}}/>
+        </button>
+        <button className='share-btn' onClick={openWeather}>
+          <img src={share} style={{width: "18px"}}/>
         </button>
       </div>
       <div className="weathercard-temp">

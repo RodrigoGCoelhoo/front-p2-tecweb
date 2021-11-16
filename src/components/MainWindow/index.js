@@ -15,8 +15,10 @@ import apiBase from '../../services/apiBase'
 export function MainWindow() {
 
   const [cidade, setCidade] = useState('')
+  const [cidadeTitle, setCidadeTitle] = useState('')
   const [lat, setLat] = useState('')
   const [long, setLong] = useState('')
+  const [favsList, setFavsList] = useState()
 
   const [favorited, setFavorited] = useState(false)
   const [forecast, setForecast] = useState([])
@@ -58,19 +60,59 @@ export function MainWindow() {
   }
 
   function searchForecast() {
+    setFavorited(false)
+    favsList.forEach((f) => {
+      if (cidade.toLowerCase() === f.cidade.toLowerCase()){
+        setFavorited(true)
+      }
+    })
     getForecast(cidade)
+    setCidadeTitle(cidade)
   }
 
-  function favChange2Off() {
+  function reSearchForecast(cidadeInput) {
+    favsList.forEach((f) => {
+      if (cidade.toLowerCase() === f.cidade.toLowerCase()){
+        setFavorited(true)
+      }
+    })
+    getForecast(cidadeInput)
+    setCidade(cidadeInput)
+    setCidadeTitle(cidadeInput)
+  }
+
+  async function favChange2Off() {
     setFavorited(false)
+
+    let favsListTemp = []
+    favsList.forEach(async (f) => {
+      if (cidade.toLowerCase() !== f.cidade.toLowerCase()) {
+        favsListTemp.push(f)
+      } 
+      else {
+        console.log(f)
+        const response = await apiBase.delete('/city/' + f.id)
+        console.log(response)
+        if (response.status === 204) {
+          toast.success("Cidade deletada dos favoritos com sucesso!")
+        } else {
+          toast.error("Erro ao deletar cidade dos favoritos!")
+        }
+      }
+    })
+    setFavsList(favsListTemp)
   }
 
   async function favChange2On() {
+    if (favsList.length === 4) {
+      toast.error("Impossível adicionar mais favoritos.")
+      return;
+    }
     setFavorited(true)
     await postFav()
   }
 
-  async function postFav(){
+  async function postFav() {
 
     const dataPost = {
       "cidade": cidade,
@@ -78,16 +120,27 @@ export function MainWindow() {
       "long": long
     }
 
-    axios.post('https://insperweatherapi.herokuapp.com/api/city/', 
-    dataPost
+    axios.post('https://insperweatherapi.herokuapp.com/api/city/',
+      dataPost
     )
       .then(res => {
         toast.success("Cidade adicionada aos favoritos com sucesso!")
+        getFavs()
       })
       .catch(err => {
         toast.error("Erro ao adicionar favorito!")
       });
   }
+
+  async function getFavs() {
+    const response = await apiBase.get('/city/')
+    console.log(response.data)
+    setFavsList(response.data)
+  }
+
+  useEffect(() => {
+    getFavs()
+  }, [])
 
   return (
     <div className="main-bg">
@@ -110,17 +163,18 @@ export function MainWindow() {
           <img src={searchIcon} alt="buscar" style={{ width: '24px' }}></img>
         </button>
       </div>
+      {cidadeTitle.length > 0 && <h2 style={{marginTop:"30px", marginBottom:"0px"}}>Previsão para {cidadeTitle}</h2>}
       {forecast.length > 0 && (
         <div className="window-weathers">
-          <Weather1d data={forecast[0]} date={d1}/>
-          <Weather1d data={forecast[1]} date={d2}/>
-          <Weather1d data={forecast[2]} date={d3}/>
-          <Weather1d data={forecast[3]} date={d4}/>
-          <Weather1d data={forecast[4]} date={d5}/>
+          <Weather1d data={forecast[0]} date={d1} />
+          <Weather1d data={forecast[1]} date={d2} />
+          <Weather1d data={forecast[2]} date={d3} />
+          <Weather1d data={forecast[3]} date={d4} />
+          <Weather1d data={forecast[4]} date={d5} />
         </div>
       )}
       <h2 className="weather-fav-title">Favoritos</h2>
-      <FavBar />
+      <FavBar favsList={favsList} setFavsList={setFavsList} setFavorited={setFavorited} search={reSearchForecast}/>
     </div>
   )
 }

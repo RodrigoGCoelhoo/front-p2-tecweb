@@ -1,6 +1,6 @@
 .weathercard-bg{
   background-color: #004AAD;
-  width: 20%;
+  width: 100%;
   height: 120px;
   border-radius: 5px;
   margin-right: 2%;
@@ -25,6 +25,22 @@
 }
 
 .trash-btn:active {
+  transform: scale(0.98);
+  box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24);
+}
+
+.share-btn{
+  position: absolute;
+  right: 38px;
+  background-color: #E8E9F3;
+  padding: 5px;
+  border-radius: 5px;
+  border: 0;
+  width: 28px;
+  height: 28px;
+}
+
+.share-btn:active {
   transform: scale(0.98);
   box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24);
 }
