@@ -71,23 +71,22 @@ export function MainWindow() {
   }
 
   async function postFav(){
+
     const dataPost = {
-      "cidade": {cidade},
-      "lat": {lat},
-      "long": {long}
+      "cidade": cidade,
+      "lat": lat,
+      "long": long
     }
 
-    console.log(dataPost)
-
-    axios({
-      method: 'post',
-      url: 'https://insperweatherapi.herokuapp.com/api/city/',
-      data: dataPost,
-    })
+    axios.post('https://insperweatherapi.herokuapp.com/api/city/', 
+    dataPost
+    )
       .then(res => {
-        console.log(res.data)
+        toast.success("Cidade adicionada aos favoritos com sucesso!")
       })
-      .catch(err => console.log(err));
+      .catch(err => {
+        toast.error("Erro ao adicionar favorito!")
+      });
   }
 
   return (
